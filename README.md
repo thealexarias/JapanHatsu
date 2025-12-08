@@ -1,2 +1,2 @@
 # JapanHatsu
-First time traveler itinerary builder
+First-time traveler itinerary builder.
