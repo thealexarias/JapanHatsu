@@ -1,2 +1,2 @@
 # Japan Hatsu 🇯🇵
-First-time traveler itinerary builder.
+Itinerary builder for first-time travelers to Japan
