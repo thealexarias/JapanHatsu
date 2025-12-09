@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'user_app',
+    'trips_app',
+    'prechecklist_app',
 ]
 
 MIDDLEWARE = [
