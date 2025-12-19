@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status as s
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from .services import generate_itinerary
 from .models import Trip, ItineraryItem
 from .serializers import TripSerializer, ItineraryItemSerializer
@@ -23,37 +24,42 @@ from .serializers import TripSerializer, ItineraryItemSerializer
 
 
 class TripGeneratorView(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+
         serializer = TripSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         trip = serializer.save(user=request.user)
 
         try:
-            itinerary_payload = generate_itinerary(serializer.validated_data)
-        except Exception:
+            itinerary_generated = generate_itinerary(trip, serializer.validated_data)
+        except Exception as e:
+            print(e)
             trip.delete()
             return Response(
                 {"detail": "Unable to generate itinerary at this time."},
                 status=s.HTTP_502_BAD_GATEWAY,
             )
-
-        items_data = itinerary_payload.get("items", [])
-        items_to_create = []
-        for entry in items_data:
-            item_serializer = ItineraryItemSerializer(data=entry)
-            item_serializer.is_valid(raise_exception=True)
-            items_to_create.append(
-                ItineraryItem(
-                    trip=trip,
-                    **item_serializer.validated_data,
-                    api_source=entry.get("api_source", "groq"),
-                )
-            )
-        ItineraryItem.objects.bulk_create(items_to_create)
-
-        return Response(TripSerializer(trip).data, status=s.HTTP_201_CREATED)
+        # items_data = itinerary_generated.get("items", [])
+        # items_to_create = []
+        # for entry in items_data:
+        #     item_serializer = ItineraryItemSerializer(data=entry)
+        #     item_serializer.is_valid(raise_exception=True)
+        #     items_to_create.append(
+        #         ItineraryItem(
+        #             trip=trip,
+        #             **item_serializer.validated_data,
+        #             api_source=entry.get("api_source", "groq"),
+        #         )
+        #     )
+        # print("B\n")
+        # ItineraryItem.objects.bulk_create(items_to_create)
+        # trip_serializer = TripSerializer(trip)
+        # print(trip_serializer.data)
+        res = ItineraryItemSerializer(itinerary_generated, many=True)
+        return Response(res.data, status=s.HTTP_201_CREATED)
 
 
 class ItineraryItemCollectionView(APIView):

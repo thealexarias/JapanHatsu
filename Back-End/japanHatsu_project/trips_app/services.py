@@ -34,7 +34,7 @@ def generate_prompt(params):
         End date: {params["end_date"]}
         Budget: {params["budget"]}
         Interests: {params["interests"]}
-        Group: {params["group"]}
+        Group: {params["group_type"]}
         Group Details: {params["group_details"]}
         Preferred Cities: {params["preferred_cities"]}
         Note: I'm saving this generated itinerary in Django. My Trip model and IteraryItem look like this:
@@ -63,7 +63,7 @@ def generate_prompt(params):
         """)
 
 
-def generate_itinerary(Trip, params):
+def generate_itinerary(trip, params):
     # generate the itinerary
     response = client.responses.create(
         model="openai/gpt-oss-20b",
@@ -73,7 +73,9 @@ def generate_itinerary(Trip, params):
     # turn the itinerary json into itineraryItem objects 
     res = []
     for itineraryItem in data:
-        it = ItineraryItem.objects.create(**itineraryItem,Trip=Trip)
+        itineraryItem = dict(itineraryItem)
+        itineraryItem["trip"] = trip 
+        it = ItineraryItem.objects.create(**itineraryItem)
         res.append(it)
     # feed this to the view to then feed into the user 
     return res
