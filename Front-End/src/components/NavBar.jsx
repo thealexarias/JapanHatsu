@@ -8,6 +8,9 @@ const navLinks = [
 
 export default function NavBar() {
   const navigate = useNavigate()
+  if (location.pathname === "/auth") { 
+    return null
+  }
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary px-3">

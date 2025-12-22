@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
-export default function LoginSignup() {
+export default function Auth() {
   const [isSignup, setIsSignup] = useState(false);
   const [formData, setFormData] = useState({
     email: "",

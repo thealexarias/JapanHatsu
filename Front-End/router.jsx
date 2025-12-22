@@ -3,7 +3,7 @@ import App from './src/App.jsx'
 import HomePage from './src/components/HomePage.jsx'
 import ItineraryPage from './src/components/ItineraryPage.jsx'
 // import Trips from './src/components/Trips.jsx'
-import LoginSignUp from './src/components/LoginSignUp.jsx'
+import Auth from './src/components/Auth.jsx'
 
 const router = createBrowserRouter([
   {
@@ -23,8 +23,8 @@ const router = createBrowserRouter([
     //     element: <Trips />,
     //   },
       {
-        path: 'loginsignup',
-        element: <LoginSignUp />,
+        path: 'auth',
+        element: <Auth />,
       },
     ],
   },

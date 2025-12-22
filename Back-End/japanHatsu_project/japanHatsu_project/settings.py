@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get("DJANGO_KEY")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -92,7 +92,9 @@ WSGI_APPLICATION = 'japanHatsu_project.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'japanHatsu_db',
+        'NAME': 'japanhatsu_db',
+        'USER': 'postgres', 
+        'PASSWORD': os.getenv("PASSWORD")
     }
 }
 
