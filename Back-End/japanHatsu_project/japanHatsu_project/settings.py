@@ -93,8 +93,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'japanhatsu_db',
-        'USER': 'postgres', 
-        'PASSWORD': os.getenv("PASSWORD")
     }
 }
 
