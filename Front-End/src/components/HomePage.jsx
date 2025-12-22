@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const INITIAL_TRIP = {
   start_date: '',
@@ -12,6 +13,7 @@ const INITIAL_TRIP = {
 
 export default function HomePage() {
   const [trip, setTrip] = useState(INITIAL_TRIP)
+  const navigate = useNavigate()
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -116,7 +118,15 @@ export default function HomePage() {
         </div>
 
         <div className="col-12 text-center">
-          <button className="btn btn-dark px-4" type="button">
+          <button
+            className="btn btn-dark px-4"
+            type="button"
+            onClick={() =>
+              navigate('/itinerary', {
+                state: { tripParams: trip, autoGenerate: true },
+              })
+            }
+          >
             Continue to Itinerary
           </button>
         </div>
@@ -124,5 +134,4 @@ export default function HomePage() {
     </section>
   )
 }
-
 

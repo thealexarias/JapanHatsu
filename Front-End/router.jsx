@@ -1,7 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
 import App from './src/App.jsx'
 import HomePage from './src/components/HomePage.jsx'
-// import ItineraryPage from './src/components/ItineraryPage.jsx'
+import ItineraryPage from './src/components/ItineraryPage.jsx'
 // import Trips from './src/components/Trips.jsx'
 import LoginSignUp from './src/components/LoginSignUp.jsx'
 
@@ -14,10 +14,10 @@ const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-    //   {
-    //     path: 'itinerary',
-    //     element: <ItineraryPage />,
-    //   },
+      {
+        path: 'itinerary',
+        element: <ItineraryPage />,
+      },
     //   {
     //     path: 'trips',
     //     element: <Trips />,
