@@ -22,8 +22,9 @@ export default function Auth() {
     const url = isSignup
       ? "http://127.0.0.1:8000/users/signup/"
       : "http://127.0.0.1:8000/users/login/";
-
+    console.log(url)
     const res = await axios.post(url, formData);
+    
 
     login(res.data.token);
     navigate("/");

@@ -74,7 +74,7 @@ def generate_itinerary(trip, params):
     res = []
     for itineraryItem in data:
         itineraryItem = dict(itineraryItem)
-        itineraryItem["trip"] = trip 
+        itineraryItem["trip"] = trip
         it = ItineraryItem.objects.create(**itineraryItem)
         res.append(it)
     # feed this to the view to then feed into the user 

@@ -2,13 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status as s
-from rest_framework.status import (
-  HTTP_200_OK,
-  HTTP_400_BAD_REQUEST,
-  HTTP_204_NO_CONTENT,
-  HTTP_502_BAD_GATEWAY,
-  HTTP_201_CREATED
-)
+from rest_framework.status import HTTP_201_CREATED
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from .services import generate_itinerary
@@ -17,17 +11,21 @@ from .serializers import TripSerializer, ItineraryItemSerializer
 
 # okay, someone made a get request to /trip/generate. I'm going to go to my services.py file which has all my logic for generating and make a call there 
 # from the call, I can return the respons 
+
+# # trip/generate 
+# class TripGeneratorView(APIView):
+#     permission_classes = [IsAuthenticated]
+#     # the request will include things like start_date, end_date, interests, etc..
+#     def get(request):
+#         trip = Trip.objects.create(**request.data)
+#         it = generate_itinerary(Trip=trip, params=request.data)
+#         return Response(it, status=HTTP_201_CREATED)
     
+
 
 class TripGeneratorView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
-    def get(request):
-        trip = Trip.objects.all()
-        ser_trip = TripSerializer(trip, many=True)
-        return Response(ser_trip, s=HTTP_200_OK)
-    
 
     def post(self, request):
 
@@ -42,10 +40,26 @@ class TripGeneratorView(APIView):
             trip.delete()
             return Response(
                 {"detail": "Unable to generate itinerary at this time."},
-                s=HTTP_502_BAD_GATEWAY,
+                status=s.HTTP_502_BAD_GATEWAY,
             )
+        # items_data = itinerary_generated.get("items", [])
+        # items_to_create = []
+        # for entry in items_data:
+        #     item_serializer = ItineraryItemSerializer(data=entry)
+        #     item_serializer.is_valid(raise_exception=True)
+        #     items_to_create.append(
+        #         ItineraryItem(
+        #             trip=trip,
+        #             **item_serializer.validated_data,
+        #             api_source=entry.get("api_source", "groq"),
+        #         )
+        #     )
+        # print("B\n")
+        # ItineraryItem.objects.bulk_create(items_to_create)
+        # trip_serializer = TripSerializer(trip)
+        # print(trip_serializer.data)
         res = ItineraryItemSerializer(itinerary_generated, many=True)
-        return Response(res.data, s=HTTP_201_CREATED)
+        return Response(res.data, status=s.HTTP_201_CREATED)
 
 
 class ItineraryItemCollectionView(APIView):
@@ -61,7 +75,7 @@ class ItineraryItemCollectionView(APIView):
         )
         return Response(
             ItineraryItemSerializer(item).data,
-            s=HTTP_201_CREATED,
+            status=s.HTTP_201_CREATED,
         )
 
 
@@ -88,4 +102,4 @@ class ItineraryItemDetailView(APIView):
             trip__user=request.user,
         )
         item.delete()
-        return Response(s=HTTP_204_NO_CONTENT)
+        return Response(status=s.HTTP_204_NO_CONTENT)
