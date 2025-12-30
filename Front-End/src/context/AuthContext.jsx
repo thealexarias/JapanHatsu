@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
 
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/users/me/", {
+        const res = await axios.get("http://127.0.0.1:8000/users/", {
           headers: {
             Authorization: `Token ${token}`,
           },
