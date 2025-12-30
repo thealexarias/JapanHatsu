@@ -64,6 +64,7 @@ class TripGeneratorView(APIView):
 
 class ItineraryItemCollectionView(APIView):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def post(self, request, trip_id):
         trip = get_object_or_404(Trip, pk=trip_id, user=request.user)
@@ -81,6 +82,7 @@ class ItineraryItemCollectionView(APIView):
 
 class ItineraryItemDetailView(APIView):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def put(self, request, trip_id, item_id):
         item = get_object_or_404(
