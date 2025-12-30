@@ -1,23 +1,48 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const navLinks = [
-  { to: '/', label: 'Home' },
-  { to: '/itinerary', label: 'Itinerary' },
-  { to: '/trips', label: 'Saved Trips' },
-]
+  { to: "/", label: "Home" },
+  { to: "/itinerary", label: "Itinerary" },
+  { to: "/trips", label: "Saved Trips" },
+];
 
 export default function NavBar() {
-  const navigate = useNavigate()
-  if (location.pathname === "/auth") { 
-    return null
-  }
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { token, isAuthenticated, logout } = useAuth();
+
+  // hide navbar on auth page
+  if (location.pathname === "/auth") return null;
+
+  const handleLogout = async () => {
+    // hit backend to delete token server-side (like Postman)
+    await axios.post(
+      "http://127.0.0.1:8000/users/logout/",
+      {},
+      { headers: { Authorization: `Token ${token}` } }
+    );
+
+    // clear local auth state
+    logout();
+
+    // send user to auth page 
+    navigate("/auth");
+  };
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary px-3">
       <div className="container-fluid">
-        <button className="navbar-brand btn btn-link text-decoration-none" type="button" onClick={() => navigate('/')}>
+        <button
+          className="navbar-brand btn btn-link text-decoration-none"
+          type="button"
+          onClick={() => navigate("/")}
+        >
           JapanHatsu
         </button>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -29,6 +54,7 @@ export default function NavBar() {
         >
           <span className="navbar-toggler-icon" />
         </button>
+
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             {navLinks.map((link) => (
@@ -39,13 +65,20 @@ export default function NavBar() {
               </li>
             ))}
           </ul>
+
           <div className="d-flex gap-2">
-            <Link className="btn btn-outline-dark" to="/auth">
-              Login / Sign Up
-            </Link>
+            {!isAuthenticated ? (
+              <Link className="btn btn-outline-dark" to="/auth">
+                Login / Sign Up
+              </Link>
+            ) : (
+              <button className="btn btn-outline-danger" onClick={handleLogout}>
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </div>
     </nav>
-  )
+  );
 }
