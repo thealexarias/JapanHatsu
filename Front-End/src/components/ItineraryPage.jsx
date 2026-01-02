@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function ItineraryPage() {
   const [itineraryItems, setItineraryItems] = useState([]);
+  const [tripId, setTripId] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -32,9 +33,28 @@ export default function ItineraryPage() {
       });
   }, [location.state, token, navigate]);
 
+  const handleSave = async () => {
+    await axios.post(
+      `http://127.0.0.1:8000/trips/${tripId}/save/`,
+      {},
+      { headers: { Authorization: `Token ${token}` } }
+    );
+    navigate("/trips");
+  };
+
   return (
     <>
-      <h1>Itinerary Page</h1>
+     <div className="d-flex justify-content-between align-items-center">
+        <h1>Itinerary Page</h1>
+
+        <button
+          className="btn btn-dark"
+          disabled={!tripId}
+          onClick={handleSave}
+        >
+          Save Trip
+        </button>
+      </div>
 
       <div className="d-flex flex-wrap gap-3">
         {itineraryItems.map((item) => (

@@ -8,6 +8,7 @@ from rest_framework.authentication import TokenAuthentication
 from .services import generate_itinerary
 from .models import Trip, ItineraryItem
 from .serializers import TripSerializer, ItineraryItemSerializer
+from django.utils import timezone
 
 # okay, someone made a get request to /trip/generate. I'm going to go to my services.py file which has all my logic for generating and make a call there 
 # from the call, I can return the respons 
@@ -104,4 +105,40 @@ class ItineraryItemDetailView(APIView):
             trip__user=request.user,
         )
         item.delete()
+        return Response(status=s.HTTP_204_NO_CONTENT)
+    
+
+
+
+class SavedTripsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        trips = Trip.objects.filter(user=request.user, saved_at__isnull=False).order_by("-saved_at")
+        return Response(TripSerializer(trips, many=True).data)
+
+
+class TripSaveView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, trip_id):
+        trip = get_object_or_404(Trip, pk=trip_id, user=request.user)
+        trip.saved_at = timezone.now()
+        trip.save()
+        return Response({"detail": "Trip saved.", "trip_id": trip.id})
+
+
+class TripDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, trip_id):
+        trip = get_object_or_404(Trip, pk=trip_id, user=request.user)
+        return Response(TripSerializer(trip).data)
+
+    def delete(self, request, trip_id):
+        trip = get_object_or_404(Trip, pk=trip_id, user=request.user)
+        trip.delete()
         return Response(status=s.HTTP_204_NO_CONTENT)

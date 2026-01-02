@@ -13,6 +13,7 @@ class Trip(models.Model):
     interests = models.JSONField()
     preferred_cities = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
+    saved_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.user.username}'s Trip ({self.start_date} → {self.end_date})"
