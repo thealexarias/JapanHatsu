@@ -21,6 +21,21 @@ export default function ItineraryPage() {
       return;
     }
 
+    const tripId = location.state?.tripId;
+
+if (tripId) {
+  axios
+    .get(`http://127.0.0.1:8000/trips/${tripId}/`, {
+      headers: { Authorization: `Token ${token}` },
+    })
+    .then((res) => {
+      setItineraryItems(res.data.items);
+    });
+  return;
+}
+
+    
+    
     // only generate when coming from homepage
     if (!autoGenerate) return;
 
@@ -30,6 +45,7 @@ export default function ItineraryPage() {
       })
       .then((res) => {
         setItineraryItems(res.data); // backend returns a LIST of itinerary items
+        if (res.data?.length) setTripId(res.data[0].trip);
       });
   }, [location.state, token, navigate]);
 
