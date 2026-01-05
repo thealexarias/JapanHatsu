@@ -3,7 +3,6 @@ export default function TripItemCard({
   start_date,
   end_date,
   budget,
-  saved_at,
   onOpen,
   onDelete,
 }) {
