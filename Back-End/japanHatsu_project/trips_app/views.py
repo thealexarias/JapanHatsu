@@ -92,7 +92,7 @@ class ItineraryItemDetailView(APIView):
             trip__id=trip_id,
             trip__user=request.user,
         )
-        serializer = ItineraryItemSerializer(item, data=request.data)
+        serializer = ItineraryItemSerializer(item, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
