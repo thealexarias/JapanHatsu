@@ -29,16 +29,29 @@ function sortItems(items) {
 export default function ItineraryPage() {
   const [itineraryItems, setItineraryItems] = useState([]);
   const [tripId, setTripId] = useState(null);
+  const [error, setError] = useState("");
 
   const location = useLocation();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
 
   useEffect(() => {
+    setError("");
+
     const state = location.state || {};
     const savedTripId = state.tripId;
     const tripParams = state.tripParams;
     const autoGenerate = state.autoGenerate;
+
+    // If they are trying to view/generate an itinerary without being logged in
+    if (!isAuthenticated) {
+      // Only show this message if they actually attempted to do something itinerary-related
+      if (savedTripId || autoGenerate) {
+        setError("You must be logged in to generate or view an itinerary.");
+      }
+      navigate("/auth");
+      return;
+    }
 
     // Open a saved trip from saved trips
     if (savedTripId) {
@@ -49,6 +62,12 @@ export default function ItineraryPage() {
         })
         .then((res) => {
           setItineraryItems(sortItems(res.data.items || []));
+        })
+        .catch((err) => {
+          if (err?.response?.status === 401) {
+            setError("Session expired. Please log in again.");
+            navigate("/auth");
+          }
         });
       return;
     }
@@ -63,13 +82,19 @@ export default function ItineraryPage() {
           const items = res.data || [];
           setItineraryItems(sortItems(items));
           if (items?.length) setTripId(items[0].trip);
+        })
+        .catch((err) => {
+          if (err?.response?.status === 401) {
+            setError("You must be logged in to generate an itinerary.");
+            navigate("/auth");
+          }
         });
       return;
     }
 
-    
+    // If user lands here directly with no state
     navigate("/");
-  }, [location.state, token, navigate]);
+  }, [location.state, token, navigate, isAuthenticated]);
 
   const maxDay = useMemo(() => {
     if (!itineraryItems.length) return 1;
@@ -101,7 +126,7 @@ export default function ItineraryPage() {
     setItineraryItems((prev) => sortItems([...prev, res.data]));
   };
 
-  // delete itinerary item 
+  // delete itinerary item
   const handleDeleteItem = async (itemId) => {
     await axios.delete(
       `http://127.0.0.1:8000/trips/${tripId}/items/${itemId}/`,
@@ -112,27 +137,36 @@ export default function ItineraryPage() {
   };
 
   const handleUpdateItem = async (itemId, payload) => {
-  const res = await axios.put(
-    `http://127.0.0.1:8000/trips/${tripId}/items/${itemId}/`,
-    payload,
-    { headers: { Authorization: `Token ${token}` } }
-  );
+    const res = await axios.put(
+      `http://127.0.0.1:8000/trips/${tripId}/items/${itemId}/`,
+      payload,
+      { headers: { Authorization: `Token ${token}` } }
+    );
 
-  setItineraryItems((prev) =>
-    sortItems(prev.map((i) => (i.id === itemId ? res.data : i)))
-  );
-};
-
+    setItineraryItems((prev) =>
+      sortItems(prev.map((i) => (i.id === itemId ? res.data : i)))
+    );
+  };
 
   return (
     <>
       <div className="d-flex justify-content-between align-items-center">
         <h1>Itinerary Page</h1>
 
-        <button className="btn btn-dark" disabled={!tripId} onClick={handleSave}>
-          Save Trip
-        </button>
+        {/* Hide Save Trip button unless authenticated */}
+        {isAuthenticated && (
+          <button
+            className="btn btn-dark"
+            disabled={!tripId}
+            onClick={handleSave}
+          >
+            Save Trip
+          </button>
+        )}
       </div>
+
+      {/* Friendly message */}
+      {error && <div className="alert alert-warning mt-3">{error}</div>}
 
       <div className="d-flex flex-wrap gap-3 mt-3">
         {itineraryItems.map((item) => (
@@ -145,8 +179,8 @@ export default function ItineraryPage() {
         ))}
       </div>
 
-
-      {tripId && (
+      {/* Hide custom form unless authenticated */}
+      {isAuthenticated && tripId && (
         <AddItineraryItemForm maxDay={maxDay} onSubmit={handleAddCustomItem} />
       )}
     </>
