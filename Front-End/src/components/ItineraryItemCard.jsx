@@ -14,6 +14,9 @@ export default function ItineraryItemCard({
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
+  // ✅ only show image if it loads successfully
+  const [imgOk, setImgOk] = useState(false);
+
   const [draft, setDraft] = useState({
     day_number: day_number || 1,
     title: title || "",
@@ -22,7 +25,6 @@ export default function ItineraryItemCard({
     end_time: end_time || "",
     description: description || "",
   });
-
 
   const dayOptions = useMemo(() => Array.from({ length: 30 }, (_, i) => i + 1), []);
 
@@ -43,7 +45,6 @@ export default function ItineraryItemCard({
   };
 
   const saveEdit = async () => {
-
     await onUpdate(id, {
       ...draft,
       day_number: Number(draft.day_number),
@@ -59,7 +60,25 @@ export default function ItineraryItemCard({
 
   return (
     <div className="card" style={{ width: "18rem" }}>
-      {image_url ? <img className="card-img-top" src={image_url} alt={title} /> : null}
+      {/* ✅ show image only if it exists AND successfully loads */}
+      {image_url && imgOk ? (
+        <img
+          className="card-img-top"
+          src={image_url}
+          alt="" // ✅ prevents the title from "duplicating" as hover text
+        />
+      ) : null}
+
+      {/* Hidden preloader: determines if URL actually works */}
+      {image_url && !imgOk ? (
+        <img
+          src={image_url}
+          alt=""
+          style={{ display: "none" }}
+          onLoad={() => setImgOk(true)}
+          onError={() => setImgOk(false)}
+        />
+      ) : null}
 
       <div className="card-body">
         {!isEditing ? (
@@ -87,7 +106,10 @@ export default function ItineraryItemCard({
               )}
 
               {onDelete && (
-                <button className="btn btn-outline-danger btn-sm" onClick={() => onDelete(id)}>
+                <button
+                  className="btn btn-outline-danger btn-sm"
+                  onClick={() => onDelete(id)}
+                >
                   Delete
                 </button>
               )}
