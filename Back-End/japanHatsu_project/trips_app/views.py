@@ -126,7 +126,6 @@ class TripWeatherView(APIView):
         try:
             forecast = get_tokyo_daily_weather(trip.start_date, trip.end_date)
         except requests.HTTPError as e:
-            # Open-Meteo can error if the range is outside available forecast window, etc.
             return Response(
                 {"detail": "Weather service error.", "error": str(e)},
                 status=s.HTTP_502_BAD_GATEWAY,

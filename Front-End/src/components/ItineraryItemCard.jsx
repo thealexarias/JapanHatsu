@@ -60,16 +60,14 @@ export default function ItineraryItemCard({
 
   return (
     <div className="card" style={{ width: "18rem" }}>
-      {/* ✅ show image only if it exists AND successfully loads */}
       {image_url && imgOk ? (
         <img
           className="card-img-top"
           src={image_url}
-          alt="" // ✅ prevents the title from "duplicating" as hover text
+          alt="" 
         />
       ) : null}
 
-      {/* Hidden preloader: determines if URL actually works */}
       {image_url && !imgOk ? (
         <img
           src={image_url}

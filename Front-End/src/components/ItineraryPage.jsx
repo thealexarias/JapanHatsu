@@ -156,7 +156,7 @@ export default function ItineraryPage() {
 
       {error && <div className="alert alert-warning mt-3">{error}</div>}
 
-      {/* ✅ Tokyo Weather */}
+
       {isAuthenticated && tripId && <WeatherPanel tripId={tripId} />}
 
       <div className="d-flex flex-wrap gap-3 mt-3">

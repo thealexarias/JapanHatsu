@@ -7,10 +7,8 @@ import "./App.css";
 export default function App() {
   return (
     <div className="app-shell">
-      {/* Navbar spans full width */}
       <NavBar />
 
-      {/* Container wraps only page content */}
       <main className="container py-4">
         <Outlet />
       </main>

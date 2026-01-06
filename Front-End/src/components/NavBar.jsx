@@ -18,7 +18,7 @@ export default function NavBar() {
   if (location.pathname === "/auth") return null;
 
   const handleLogout = async () => {
-    // hit backend to delete token server-side
+    // hit backend to delete token serverside
     await axios.post(
       "http://127.0.0.1:8000/users/logout/",
       {},

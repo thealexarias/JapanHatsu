@@ -1,4 +1,3 @@
-# trips_app/weather_service.py
 import requests
 
 TOKYO_LAT = 35.6762
@@ -7,13 +6,6 @@ BASE_URL = "https://api.open-meteo.com/v1/forecast"
 
 
 def get_tokyo_daily_weather(start_date, end_date):
-    """
-    Returns a list of dicts like:
-    [
-      { "date": "2026-01-06", "temp_max": 10.2, "temp_min": 3.1, "precip_mm": 0.0, "weathercode": 3 },
-      ...
-    ]
-    """
     params = {
         "latitude": TOKYO_LAT,
         "longitude": TOKYO_LON,

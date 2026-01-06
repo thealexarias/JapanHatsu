@@ -1,17 +1,3 @@
-# services.py takes care of the logic for the views
-
-# and the views talks to the user basically and based on that response, may do some work and give it back to the user 
-
-
-# so the user will input some parameters for us (e.g., start date, end date, etc.) then the frontend will send that information over to the backend via a POST request
-# which will then prompt the backend to ask Groq to generate an itinerary and the backend will that generated itinerary and save it off as a Trip + ItineraryItem object in the DB.
-# Next, the backend will take that recently saved object and send it over to the frontend via a GET request so the frontend can display it to the user 
-# 
-
-
-# But if the user doesn't like something, they can UPDATE, DELETE, CREATE an interary item or the entire trip  
-
-
 from openai import OpenAI
 import os
 import json
