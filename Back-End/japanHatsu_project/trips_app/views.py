@@ -9,21 +9,10 @@ from .services import generate_itinerary
 from .models import Trip, ItineraryItem
 from .serializers import TripSerializer, ItineraryItemSerializer
 from django.utils import timezone
+import requests
+from .weather_service import get_tokyo_daily_weather
 
-# okay, someone made a get request to /trip/generate. I'm going to go to my services.py file which has all my logic for generating and make a call there 
-# from the call, I can return the respons 
-
-# # trip/generate 
-# class TripGeneratorView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     # the request will include things like start_date, end_date, interests, etc..
-#     def get(request):
-#         trip = Trip.objects.create(**request.data)
-#         it = generate_itinerary(Trip=trip, params=request.data)
-#         return Response(it, status=HTTP_201_CREATED)
     
-
-
 class TripGeneratorView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -43,22 +32,6 @@ class TripGeneratorView(APIView):
                 {"detail": "Unable to generate itinerary at this time."},
                 status=s.HTTP_502_BAD_GATEWAY,
             )
-        # items_data = itinerary_generated.get("items", [])
-        # items_to_create = []
-        # for entry in items_data:
-        #     item_serializer = ItineraryItemSerializer(data=entry)
-        #     item_serializer.is_valid(raise_exception=True)
-        #     items_to_create.append(
-        #         ItineraryItem(
-        #             trip=trip,
-        #             **item_serializer.validated_data,
-        #             api_source=entry.get("api_source", "groq"),
-        #         )
-        #     )
-        # print("B\n")
-        # ItineraryItem.objects.bulk_create(items_to_create)
-        # trip_serializer = TripSerializer(trip)
-        # print(trip_serializer.data)
         res = ItineraryItemSerializer(itinerary_generated, many=True)
         return Response(res.data, status=s.HTTP_201_CREATED)
 
@@ -109,7 +82,6 @@ class ItineraryItemDetailView(APIView):
     
 
 
-
 class SavedTripsView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -142,3 +114,34 @@ class TripDetailView(APIView):
         trip = get_object_or_404(Trip, pk=trip_id, user=request.user)
         trip.delete()
         return Response(status=s.HTTP_204_NO_CONTENT)
+
+
+class TripWeatherView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, trip_id):
+        trip = get_object_or_404(Trip, pk=trip_id, user=request.user)
+
+        try:
+            forecast = get_tokyo_daily_weather(trip.start_date, trip.end_date)
+        except requests.HTTPError as e:
+            # Open-Meteo can error if the range is outside available forecast window, etc.
+            return Response(
+                {"detail": "Weather service error.", "error": str(e)},
+                status=s.HTTP_502_BAD_GATEWAY,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": "Unable to fetch weather right now.", "error": str(e)},
+                status=s.HTTP_502_BAD_GATEWAY,
+            )
+
+        return Response(
+            {
+                "trip_id": trip.id,
+                "city": "Tokyo",
+                "timezone": "Asia/Tokyo",
+                "daily": forecast,
+            }
+        )

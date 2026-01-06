@@ -4,6 +4,7 @@ import axios from "axios";
 import ItineraryItemCard from "./ItineraryItemCard";
 import AddItineraryItemForm from "./AddItineraryItemForm";
 import { useAuth } from "../context/AuthContext";
+import WeatherPanel from "./WeatherPanel";
 
 function timeToMinutes(t) {
   if (!t || typeof t !== "string") return 99999;
@@ -43,9 +44,7 @@ export default function ItineraryPage() {
     const tripParams = state.tripParams;
     const autoGenerate = state.autoGenerate;
 
-    // If they are trying to view/generate an itinerary without being logged in
     if (!isAuthenticated) {
-      // Only show this message if they actually attempted to do something itinerary-related
       if (savedTripId || autoGenerate) {
         setError("You must be logged in to generate or view an itinerary.");
       }
@@ -53,7 +52,6 @@ export default function ItineraryPage() {
       return;
     }
 
-    // Open a saved trip from saved trips
     if (savedTripId) {
       setTripId(savedTripId);
       axios
@@ -72,7 +70,6 @@ export default function ItineraryPage() {
       return;
     }
 
-    // Generate a new trip from homepage
     if (tripParams && autoGenerate) {
       axios
         .post("http://127.0.0.1:8000/trips/generate/", tripParams, {
@@ -92,7 +89,6 @@ export default function ItineraryPage() {
       return;
     }
 
-    // If user lands here directly with no state
     navigate("/");
   }, [location.state, token, navigate, isAuthenticated]);
 
@@ -110,7 +106,6 @@ export default function ItineraryPage() {
     navigate("/trips");
   };
 
-  // create custom itinerary item
   const handleAddCustomItem = async (payload) => {
     const res = await axios.post(
       `http://127.0.0.1:8000/trips/${tripId}/items/`,
@@ -126,7 +121,6 @@ export default function ItineraryPage() {
     setItineraryItems((prev) => sortItems([...prev, res.data]));
   };
 
-  // delete itinerary item
   const handleDeleteItem = async (itemId) => {
     await axios.delete(
       `http://127.0.0.1:8000/trips/${tripId}/items/${itemId}/`,
@@ -153,20 +147,17 @@ export default function ItineraryPage() {
       <div className="d-flex justify-content-between align-items-center">
         <h1>Itinerary Page</h1>
 
-        {/* Hide Save Trip button unless authenticated */}
         {isAuthenticated && (
-          <button
-            className="btn btn-dark"
-            disabled={!tripId}
-            onClick={handleSave}
-          >
+          <button className="btn btn-dark" disabled={!tripId} onClick={handleSave}>
             Save Trip
           </button>
         )}
       </div>
 
-      {/* Friendly message */}
       {error && <div className="alert alert-warning mt-3">{error}</div>}
+
+      {/* ✅ Tokyo Weather */}
+      {isAuthenticated && tripId && <WeatherPanel tripId={tripId} />}
 
       <div className="d-flex flex-wrap gap-3 mt-3">
         {itineraryItems.map((item) => (
@@ -179,7 +170,6 @@ export default function ItineraryPage() {
         ))}
       </div>
 
-      {/* Hide custom form unless authenticated */}
       {isAuthenticated && tripId && (
         <AddItineraryItemForm maxDay={maxDay} onSubmit={handleAddCustomItem} />
       )}
