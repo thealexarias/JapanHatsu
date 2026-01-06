@@ -24,11 +24,10 @@ a:hover {
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
 }
+
 
 h1 {
   font-size: 3.2em;
@@ -65,4 +64,11 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+/* Make the native date picker icon visible in dark mode */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  filter: invert(1);
 }

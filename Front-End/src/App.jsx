@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
-import './App.css'
-import { Outlet } from 'react-router-dom'
-import NavBar from './components/NavBar.jsx'
-import './App.css'
+import { Outlet } from "react-router-dom";
+import NavBar from "./components/NavBar.jsx";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
 
 export default function App() {
-
-
   return (
     <div className="app-shell">
+      {/* Navbar spans full width */}
       <NavBar />
-      <main>
+
+      {/* Container wraps only page content */}
+      <main className="container py-4">
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

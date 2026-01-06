@@ -74,6 +74,8 @@ def generate_itinerary(trip, params):
     res = []
     for itineraryItem in data:
         itineraryItem = dict(itineraryItem)
+        # prevents random images
+        itineraryItem["image_url"] = ""
         itineraryItem["trip"] = trip
         it = ItineraryItem.objects.create(**itineraryItem)
         res.append(it)
