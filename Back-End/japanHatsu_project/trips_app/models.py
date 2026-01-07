@@ -24,6 +24,7 @@ class ItineraryItem(models.Model):
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, related_name="items")
     day_number = models.IntegerField()
     title = models.CharField(max_length=255)
+    category = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     location = models.CharField(max_length=255, blank=True)
     image_url = models.CharField(max_length=500, blank=True)
